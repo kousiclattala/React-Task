@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setIsLoggedIn } from "../redux/authSlice";
 import { signup } from "../utils/Config";
-import { EMAIL_REG } from "../utils/Constants";
+import { EMAIL_REG, PASSWORD_REG } from "../utils/Constants";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -19,28 +19,57 @@ const Signup = () => {
   const [isPhoneNumberEmpty, setIsPhoneNumberEmpty] = useState(false);
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   //handling signup
   const handleUserSignup = async () => {
-    const user = {
-      email,
-      phoneNumber,
-      password,
-    };
+    if (
+      EMAIL_REG.test(email) === false &&
+      PASSWORD_REG.test(password) === false &&
+      phoneNumber.length !== 10
+    ) {
+      return setIsEmailEmpty(true), setIsPasswordEmpty(true);
+    } else if (EMAIL_REG.test(email) === false) {
+      return setIsEmailEmpty(true);
+    } else if (PASSWORD_REG.test(password) === false) {
+      return setIsPasswordEmpty(true);
+    } else if (phoneNumber.length !== 10) {
+      return setIsPhoneNumberEmpty(true);
+    } else {
+      setIsLoading(true);
+      const user = {
+        email,
+        phoneNumber,
+        password,
+      };
 
-    await axios
-      .post(signup, user)
-      .then((res) => {
-        console.log("res from user signup | ", res.data);
-        toast.success(res.data.msg);
-        dispatch(setIsLoggedIn(true));
+      await axios
+        .post(signup, user)
+        .then((res) => {
+          setIsLoading(false);
+          console.log("res from user signup | ", res.data);
+          toast.success(res.data.msg);
+          dispatch(setIsLoggedIn(true));
 
-        localStorage.setItem("@token", res.data.token);
-      })
-      .catch((err) => {
-        console.log("err from user signup | ", err.response.data);
-        toast.error(err.response.data.msg);
-      });
+          localStorage.setItem("@token", res.data.token);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log("err from user signup | ", err.response.data);
+          toast.error(err.response.data.msg);
+        });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-content-center">
+        <div className="spinner-border m-5" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="d-flex justify-content-center mt-5">
@@ -64,12 +93,12 @@ const Signup = () => {
                   setIsEmailEmpty(false);
                 }}
                 onMouseOut={() => {
-                  EMAIL_REG.test(email) == false
+                  EMAIL_REG.test(email) === false
                     ? setIsEmailEmpty(true)
                     : setIsEmailEmpty(false);
                 }}
               />
-              {isEmailEmpty && EMAIL_REG.test(email) == false && (
+              {isEmailEmpty && EMAIL_REG.test(email) === false && (
                 <p className="text-danger fs-6">Please enter valid email id</p>
               )}
             </div>
@@ -97,7 +126,7 @@ const Signup = () => {
               />
               {isPhoneNumberEmpty && (
                 <p className="text-danger fs-6">
-                  Please enter valid phone number
+                  Phone number should be of 10 digits
                 </p>
               )}
             </div>
@@ -117,13 +146,16 @@ const Signup = () => {
                   setIsPasswordEmpty(false);
                 }}
                 onMouseOut={() => {
-                  password.length !== 6
+                  PASSWORD_REG.test(password) === false
                     ? setIsPasswordEmpty(true)
                     : setIsPasswordEmpty(false);
                 }}
               />
-              {isPasswordEmpty && (
-                <p className="text-danger fs-6">Please enter valid password</p>
+              {isPasswordEmpty && PASSWORD_REG.test(password) === false && (
+                <p className="text-danger fs-6">
+                  Password should contain 1 uppercase, 1 lowercase, 1 number, 1
+                  special character and must be min 6 characters
+                </p>
               )}
               <p
                 className="text-end fs-6 fw-lighter "
@@ -131,7 +163,7 @@ const Signup = () => {
                   color: "#06b1e0",
                 }}
               >
-                Minimum 8 alphanumeric
+                Minimum 6 alphanumeric
               </p>
             </div>
 

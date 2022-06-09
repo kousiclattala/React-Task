@@ -13,40 +13,52 @@ function CreateCandidateModal({ getAllCandidatesData }) {
   const [age, setAge] = useState(0);
   const [pincode, setPincode] = useState(0);
 
-  const [isClose, setIsClose] = useState("");
+  const [target, setTarget] = useState("");
 
   //creating the user
   const handleCreateCandidate = async () => {
     const token = localStorage.getItem("@token");
 
-    const candidate = {
-      name,
-      email,
-      dob,
-      address,
-      state,
-      result: result.toLowerCase(),
-      age,
-      pincode,
-    };
+    if (
+      !name ||
+      !email ||
+      !dob ||
+      !address ||
+      !state ||
+      !result ||
+      !age ||
+      !pincode
+    ) {
+      return toast.error("Please include all fields"), setTarget("");
+    } else {
+      setTarget("modal");
+      const candidate = {
+        name,
+        email,
+        dob,
+        address,
+        state,
+        result: result.toLowerCase(),
+        age,
+        pincode,
+      };
 
-    await axios
-      .post(createCandidate, candidate, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((res) => {
-        console.log("res from create candidate ", res.data);
-        toast.success(res.data.msg);
-        setIsClose("modal");
-        getAllCandidatesData();
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(err.response.data.msg);
-        setIsClose("");
-      });
+      await axios
+        .post(createCandidate, candidate, {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        })
+        .then((res) => {
+          console.log("res from create candidate ", res.data);
+          toast.success(res.data.msg);
+          getAllCandidatesData();
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error(err.response.data.msg);
+        });
+    }
   };
 
   return (
@@ -168,7 +180,7 @@ function CreateCandidateModal({ getAllCandidatesData }) {
                       >
                         <li>
                           <p
-                            class="dropdown-item"
+                            className="dropdown-item"
                             onClick={(e) => setResult(e.target.innerText)}
                           >
                             Shortlist
@@ -176,7 +188,7 @@ function CreateCandidateModal({ getAllCandidatesData }) {
                         </li>
                         <li>
                           <p
-                            class="dropdown-item"
+                            className="dropdown-item"
                             onClick={(e) => setResult(e.target.innerText)}
                           >
                             Selected
@@ -184,7 +196,7 @@ function CreateCandidateModal({ getAllCandidatesData }) {
                         </li>
                         <li>
                           <p
-                            class="dropdown-item"
+                            className="dropdown-item"
                             onClick={(e) => setResult(e.target.innerText)}
                           >
                             Rejected
@@ -283,7 +295,7 @@ function CreateCandidateModal({ getAllCandidatesData }) {
               <button
                 type="button"
                 className="btn  px-5 py-3"
-                data-bs-dismiss="modal"
+                data-bs-dismiss={target}
                 style={{
                   backgroundColor: "#06b1e0",
                   color: "#fff",

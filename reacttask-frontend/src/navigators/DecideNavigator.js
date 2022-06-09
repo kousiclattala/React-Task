@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomeScreen from "../screens/HomeScreen";
 import Signin from "../screens/Signin";
 import Signup from "../screens/Signup";
 import { setIsLoggedIn } from "../redux/authSlice";
-import { Outlet } from "react-router-dom";
 import ForgotPassword from "../screens/ForgotPassword";
 
 function DecideNavigator() {
@@ -15,16 +14,12 @@ function DecideNavigator() {
   useEffect(() => {
     const token = localStorage.getItem("@token");
 
-    console.log("token ", token);
-
     if (token == null) {
       dispatch(setIsLoggedIn(false));
     } else {
       dispatch(setIsLoggedIn(true));
     }
-  }, []);
-
-  console.log("is logged in ", isLoggedIn);
+  }, [dispatch]);
 
   return (
     <Routes>

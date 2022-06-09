@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn } from "../redux/authSlice";
-import { EMAIL_REG } from "../utils/Constants";
+import { EMAIL_REG, PASSWORD_REG } from "../utils/Constants";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -21,29 +21,38 @@ const Signin = () => {
 
   //handling signin
   const handleUserSignin = async () => {
-    console.log("inside api call method");
+    if (
+      EMAIL_REG.test(email) === false &&
+      PASSWORD_REG.test(password) === false
+    ) {
+      return setIsEmailEmpty(true), setIsPasswordEmpty(true);
+    } else if (EMAIL_REG.test(email) === false) {
+      return setIsEmailEmpty(true);
+    } else if (PASSWORD_REG.test(password) === false) {
+      return setIsPasswordEmpty(true);
+    } else {
+      setIsLoading(true);
+      const user = {
+        email,
+        password,
+      };
 
-    setIsLoading(true);
-    const user = {
-      email,
-      password,
-    };
-
-    await axios
-      .post(signin, user)
-      .then((res) => {
-        console.log("inside api call method", res.data);
-        toast.success(res.data.msg);
-        setIsLoading(false);
-        dispatch(setIsLoggedIn(true));
-        localStorage.setItem("@token", res.data.token);
-      })
-      .catch((err) => {
-        setIsLoading(false);
-        toast.error(err.response.data.msg);
-        console.log(err);
-        dispatch(setIsLoading(false));
-      });
+      await axios
+        .post(signin, user)
+        .then((res) => {
+          console.log("inside api call method", res.data);
+          toast.success(res.data.msg);
+          setIsLoading(false);
+          dispatch(setIsLoggedIn(true));
+          localStorage.setItem("@token", res.data.token);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          toast.error(err.response.data.msg);
+          console.log(err);
+          dispatch(setIsLoading(false));
+        });
+    }
   };
 
   if (isLoading) {
@@ -78,12 +87,12 @@ const Signin = () => {
                   setIsEmailEmpty(false);
                 }}
                 onMouseOut={() => {
-                  EMAIL_REG.test(email) == false
+                  EMAIL_REG.test(email) === false
                     ? setIsEmailEmpty(true)
                     : setIsEmailEmpty(false);
                 }}
               />
-              {isEmailEmpty && EMAIL_REG.test(email) == false && (
+              {isEmailEmpty && EMAIL_REG.test(email) === false && (
                 <p className="text-danger fs-6">Please enter valid email id</p>
               )}
             </div>
@@ -103,13 +112,16 @@ const Signin = () => {
                   setIsPasswordEmpty(false);
                 }}
                 onMouseOut={() => {
-                  password.length !== 6
+                  PASSWORD_REG.test(password) === false
                     ? setIsPasswordEmpty(true)
                     : setIsPasswordEmpty(false);
                 }}
               />
-              {isPasswordEmpty && (
-                <p className="text-danger fs-6">Please enter valid password</p>
+              {isPasswordEmpty && PASSWORD_REG.test(password) === false && (
+                <p className="text-danger fs-6">
+                  Password should contain 1 uppercase, 1 lowercase, 1 number, 1
+                  special character and must be min 6 characters
+                </p>
               )}
               <p
                 className="text-end fs-6 fw-lighter "

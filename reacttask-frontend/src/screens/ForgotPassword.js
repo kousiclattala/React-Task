@@ -4,8 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setIsLoggedIn } from "../redux/authSlice";
-import { forgotPassword, signup } from "../utils/Config";
-import { EMAIL_REG } from "../utils/Constants";
+import { forgotPassword } from "../utils/Config";
+import { EMAIL_REG, PASSWORD_REG } from "../utils/Constants";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -21,24 +21,42 @@ const ForgotPassword = () => {
 
   //handling forgot password
   const handleResetPassword = async () => {
-    const user = {
-      email,
-      password,
-    };
+    if (
+      EMAIL_REG.test(email) === false &&
+      PASSWORD_REG.test(password) === false &&
+      PASSWORD_REG.test(rePassword) === false
+    ) {
+      return (
+        setIsEmailEmpty(true),
+        setIsPasswordEmpty(true),
+        setIsRePasswordEmpty(true)
+      );
+    } else if (EMAIL_REG.test(email) === false) {
+      return setIsEmailEmpty(true);
+    } else if (PASSWORD_REG.test(password) === false) {
+      return setIsPasswordEmpty(true);
+    } else if (PASSWORD_REG.test(rePassword) === false) {
+      return setIsRePasswordEmpty(true);
+    } else {
+      const user = {
+        email,
+        password,
+      };
 
-    await axios
-      .post(forgotPassword, user)
-      .then((res) => {
-        console.log("res from forgotpassword | ", res.data);
-        toast.success(res.data.msg);
-        dispatch(setIsLoggedIn(true));
+      await axios
+        .post(forgotPassword, user)
+        .then((res) => {
+          console.log("res from forgotpassword | ", res.data);
+          toast.success(res.data.msg);
+          dispatch(setIsLoggedIn(true));
 
-        localStorage.setItem("@token", res.data.token);
-      })
-      .catch((err) => {
-        console.log("err from forgotpassword | ", err.response.data);
-        toast.error(err.response.data.msg);
-      });
+          localStorage.setItem("@token", res.data.token);
+        })
+        .catch((err) => {
+          console.log("err from forgotpassword | ", err.response.data);
+          toast.error(err.response.data.msg);
+        });
+    }
   };
 
   return (
@@ -63,12 +81,12 @@ const ForgotPassword = () => {
                   setIsEmailEmpty(false);
                 }}
                 onMouseOut={() => {
-                  EMAIL_REG.test(email) == false
+                  EMAIL_REG.test(email) === false
                     ? setIsEmailEmpty(true)
                     : setIsEmailEmpty(false);
                 }}
               />
-              {isEmailEmpty && EMAIL_REG.test(email) == false && (
+              {isEmailEmpty && EMAIL_REG.test(email) === false && (
                 <p className="text-danger fs-6">Please enter valid email id</p>
               )}
             </div>
@@ -88,13 +106,16 @@ const ForgotPassword = () => {
                   setIsPasswordEmpty(false);
                 }}
                 onMouseOut={() => {
-                  password.length !== 6
+                  PASSWORD_REG.test(password) === false
                     ? setIsPasswordEmpty(true)
                     : setIsPasswordEmpty(false);
                 }}
               />
-              {isPasswordEmpty && (
-                <p className="text-danger fs-6">Please enter valid password</p>
+              {isPasswordEmpty && PASSWORD_REG.test(password) === false && (
+                <p className="text-danger fs-6">
+                  Password should contain 1 uppercase, 1 lowercase, 1 number, 1
+                  special character and must be min 6 characters
+                </p>
               )}
               <p
                 className="text-end fs-6 fw-lighter "
@@ -121,13 +142,16 @@ const ForgotPassword = () => {
                   setIsRePasswordEmpty(false);
                 }}
                 onMouseOut={() => {
-                  rePassword.length !== 6
+                  PASSWORD_REG.test(rePassword) === false
                     ? setIsRePasswordEmpty(true)
                     : setIsRePasswordEmpty(false);
                 }}
               />
-              {isRePasswordEmpty && (
-                <p className="text-danger fs-6">Please enter valid password</p>
+              {isRePasswordEmpty && PASSWORD_REG.test(rePassword) === false && (
+                <p className="text-danger fs-6">
+                  Password should contain 1 uppercase, 1 lowercase, 1 number, 1
+                  special character and must be min 6 characters
+                </p>
               )}
               <p
                 className="text-end fs-6 fw-lighter "
