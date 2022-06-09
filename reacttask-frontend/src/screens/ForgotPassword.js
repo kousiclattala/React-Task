@@ -19,6 +19,7 @@ const ForgotPassword = () => {
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
   const [isRePasswordEmpty, setIsRePasswordEmpty] = useState(false);
 
+  //handling forgot password
   const handleResetPassword = async () => {
     const user = {
       email,

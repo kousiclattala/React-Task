@@ -28,12 +28,14 @@ const HomeScreen = () => {
   const [age, setAge] = useState(0);
   const [pincode, setPincode] = useState(0);
 
+  //handling logout
   const handleLogout = () => {
     const res = localStorage.removeItem("@token");
     console.log("res after localstorage clear ", res);
     dispatch(setIsLoggedIn(false));
   };
 
+  //getting all candidates details
   const getAllCandidatesData = async () => {
     const token = localStorage.getItem("@token");
 
@@ -52,6 +54,7 @@ const HomeScreen = () => {
       });
   };
 
+  //handling deleting candidate
   const handleDeleteCandidate = async (id) => {
     const token = localStorage.getItem("@token");
 
@@ -72,6 +75,7 @@ const HomeScreen = () => {
       });
   };
 
+  //handling to get single candidate
   const getSingleCandidate = async (id) => {
     const token = localStorage.getItem("@token");
 
@@ -101,6 +105,7 @@ const HomeScreen = () => {
       });
   };
 
+  //handling to update single candidate
   const handleUpdateSingleCandidate = async (id) => {
     const token = localStorage.getItem("@token");
 

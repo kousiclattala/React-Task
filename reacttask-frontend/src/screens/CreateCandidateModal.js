@@ -15,6 +15,7 @@ function CreateCandidateModal({ getAllCandidatesData }) {
 
   const [isClose, setIsClose] = useState("");
 
+  //creating the user
   const handleCreateCandidate = async () => {
     const token = localStorage.getItem("@token");
 

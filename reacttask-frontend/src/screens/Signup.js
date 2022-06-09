@@ -19,6 +19,7 @@ const Signup = () => {
   const [isPhoneNumberEmpty, setIsPhoneNumberEmpty] = useState(false);
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
 
+  //handling signup
   const handleUserSignup = async () => {
     const user = {
       email,

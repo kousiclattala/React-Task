@@ -23,12 +23,14 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+//creating the encrypted password before saving the user, using mongoose inbuilt methods.
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+//creating token by using jwt, here secret should be kept in env file.
 userSchema.methods.generateToken = function () {
   const token = jwt.sign({ id: this._id }, "thisissecretfortoken", {
     expiresIn: "3 days",
